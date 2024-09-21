@@ -30,7 +30,7 @@ const int DELAY = 5;
 // specific motor and power supply voltage
 const uint8_t RUN_CURRENT_PERCENT = 100;
 const int32_t VELOCITY = 1500;
-const uint8_t STALL_GUARD_THRESHOLD = 500;
+const uint8_t STALL_GUARD_THRESHOLD = 40;
 
 // current values may need to be reduced to prevent overheating depending on
 // specific motor and power supply voltage
@@ -109,11 +109,11 @@ void setup() {
   Serial.println(venstreStepper.getVersion());
   //venstreStepper.moveUsingStepDirInterface();
   venstreStepper.enableAutomaticCurrentScaling();
-  stepperH.setMaxSpeed(FART);
+ /* stepperH.setMaxSpeed(FART);
   stepperH.setAcceleration(ACCEL);
   //stepperH.moveTo(-5000);
   stepperV.setMaxSpeed(FART);
-  stepperV.setAcceleration(ACCEL);
+  stepperV.setAcceleration(ACCEL);*/
   Serial.println("hallo");
 }
 
@@ -129,13 +129,14 @@ void loop() {
   uint16_t stall_guard_result = hojreStepper.getStallGuardResult();
   delay(1);
   uint16_t stall_guard_result2 = venstreStepper.getStallGuardResult();
-  Serial.print("stall guard result : ");
+  //Serial.print("stall guard result : ");
   Serial.print(stall_guard_result);
-  Serial.print(" stall guard result2 : ");
-  Serial.println(stall_guard_result2);
+  Serial.print(" : ");
+  Serial.print(stall_guard_result2);
+  Serial.println(" : ");
   afstand = afstand + (11 * (afstand == -1));
-  if (startTid + 500 < millis()) {
-    if (stall_guard_result < hojreThreshold || stall_guard_result2 < venstreThreshold || afstand < 10) {
+  if (startTid + 1500 < millis()) {
+    if ((stall_guard_result < hojreThreshold || stall_guard_result2 < venstreThreshold || afstand < 10) && stall_guard_result != 0) {
       roterende = true;
       hojreStepper.disableInverseMotorDirection();
       delay(1);
@@ -150,7 +151,7 @@ void loop() {
         hojreStepper.enableInverseMotorDirection();
       }
       speedOp();
-      afstandDelay(6500);
+      afstandDelay(random(0,6500));
       speedNed();
       hojreStepper.enableInverseMotorDirection();
       venstreStepper.enableInverseMotorDirection();
@@ -160,7 +161,7 @@ void loop() {
       for (int i = 0; i < processAfstand; i++) {
         Serial.println(afstande[i]);
       }
-      Serial.println(processAfstand);
+      //Serial.println(processAfstand);
       speedOp();
     }
   }
@@ -220,4 +221,3 @@ void afstandDelay(int forsinkelse) {
     readAfstand();
   }
 }
-

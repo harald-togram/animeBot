@@ -29,7 +29,7 @@ const int DELAY = 5;
 // current values may need to be reduced to prevent overheating depending on
 // specific motor and power supply voltage
 const uint8_t RUN_CURRENT_PERCENT = 100;
-const int32_t VELOCITY = 000;
+const int32_t VELOCITY = 1500;
 const uint8_t STALL_GUARD_THRESHOLD = 500;
 
 // current values may need to be reduced to prevent overheating depending on
@@ -59,8 +59,8 @@ byte process = 0;
 String inputString = "";      // a String to hold incoming data
 bool stringComplete = false;  // whether the string is complete
 
-const int venstreThreshold = 48;
-const int hojreThreshold = 40;
+const int venstreThreshold = 50;
+const int hojreThreshold = 50;
 void setup() {
   // initialize serial:
   Serial2.begin(115200);
@@ -86,7 +86,7 @@ void setup() {
   hojreStepper.enableCoolStep(COOL_STEP_LOWER_THRESHOLD, COOL_STEP_UPPER_THRESHOLD);*/
   hojreStepper.moveAtVelocity(VELOCITY);
   //hojreStepper.moveUsingStepDirInterface();
-  //hojreStepper.enableAutomaticCurrentScaling();
+  hojreStepper.enableAutomaticCurrentScaling();
   Serial.println(hojreStepper.getVersion());
   delay(100);
 
@@ -108,7 +108,7 @@ void setup() {
   venstreStepper.moveAtVelocity(VELOCITY);
   Serial.println(venstreStepper.getVersion());
   //venstreStepper.moveUsingStepDirInterface();
-  //venstreStepper.enableAutomaticCurrentScaling();
+  venstreStepper.enableAutomaticCurrentScaling();
   stepperH.setMaxSpeed(FART);
   stepperH.setAcceleration(ACCEL);
   //stepperH.moveTo(-5000);
@@ -129,10 +129,10 @@ void loop() {
   uint16_t stall_guard_result = hojreStepper.getStallGuardResult();
   delay(1);
   uint16_t stall_guard_result2 = venstreStepper.getStallGuardResult();
-  /*Serial.print("stall guard result : ");
+  Serial.print("stall guard result : ");
   Serial.print(stall_guard_result);
   Serial.print(" stall guard result2 : ");
-  Serial.println(stall_guard_result2);*/
+  Serial.println(stall_guard_result2);
   afstand = afstand + (11 * (afstand == -1));
   if (startTid + 500 < millis()) {
     if (stall_guard_result < hojreThreshold || stall_guard_result2 < venstreThreshold || afstand < 10) {
